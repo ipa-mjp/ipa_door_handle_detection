@@ -42,7 +42,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/segmentation/region_growing.h>
-
+#include <tf/transform_broadcaster.h>
 
 #include <boost/thread/mutex.hpp>
 
@@ -95,6 +95,8 @@ public:
 	bool checkBB3DOrientation(Eigen::Matrix4f,pcl::ModelCoefficients::Ptr cylinder_coeff);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr removeNoisefromPC(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,double dist);
+
+	void createKOSinROS(Eigen::Matrix4f pca_trafo,Eigen::Vector4f centroid, std::string kos_name);
 
 
 

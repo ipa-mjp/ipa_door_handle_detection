@@ -408,7 +408,7 @@ pcaInformation PointCloudSegmentation::calculatePCA(pcl::PointCloud<pcl::PointXY
 	Eigen::Vector3f eigenVectorPCA_z = eigenVectorPCA_x.cross(eigenVectorPCA_y);
 
 	//These eigenvectors are used to transform the point cloud to the origin point (0, 0, 0) such that the eigenvectors correspond to the axes of the space. 
-	// The minimum point, maximum point, and the middle of the diagonal between these two points are calculated for the transformed cloud (also referred to as the projected cloud when using PCL's PCA interface, or reference cloud by Nicola).
+	// The minimum point, maximum point, and the middle of the diagonal between these two points are calculated for the transformed cloud (also referred to as the projected cloud when using PCL's PCA interface, or refesegmentPointCloudrence cloud by Nicola).
 	// Transform the original cloud to the origin where the principal components correspond to the axes.
 	Eigen::Matrix4f pca_trafo(Eigen::Matrix4f::Identity());
 
@@ -516,4 +516,32 @@ pcaInformation PointCloudSegmentation::calculatePCA(pcl::PointCloud<pcl::PointXY
 
 
 		return output_cloud1;
+	}
+
+
+
+	void PointCloudSegmentation::createKOSinROS(Eigen::Matrix4f cluster_pca_trafo,Eigen::Vector4f cluster_centroid, std::string cluster_kos_name)
+	{
+		// PUT TO FUNCTION 			
+		tf::Matrix3x3 tf3d_cluster;
+		tf3d_cluster.setValue(static_cast<double>(cluster_pca_trafo(0,0)), static_cast<double>(cluster_pca_trafo(0,1)), static_cast<double>(cluster_pca_trafo(0,2)), 
+		static_cast<double>(cluster_pca_trafo(1,0)), static_cast<double>(cluster_pca_trafo(1,1)), static_cast<double>(cluster_pca_trafo(1,2)), 
+		static_cast<double>(cluster_pca_trafo(2,0)), static_cast<double>(cluster_pca_trafo(2,1)), static_cast<double>(cluster_pca_trafo(2,2)));
+
+		tf::Quaternion tfqt;
+ 		tf::Quaternion q;
+
+		tf3d_cluster.getRotation(tfqt);
+		tf::Transform transform;
+		transform.setOrigin( tf::Vector3(cluster_centroid(0), cluster_centroid(1), cluster_centroid(2)) );
+		transform.setRotation(tfqt);
+
+		double r=-3.1415, p=0, y=0; // rotate 180° around x
+
+		q.setRPY(r, p, y);
+		transform.setRotation(q);
+
+		static tf::TransformBroadcaster br;		
+ 		br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "pico_flexx_optical_frame", cluster_kos_name));
+
 	}

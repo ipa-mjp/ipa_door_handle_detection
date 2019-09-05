@@ -1,0 +1,19 @@
+How to start door handle detection
+
+1) launch pico flexx camera: roslaunch pico_flexx_driver pico_flexx_driver.launch publish_tf:=true base_name_tf:=pico_flexx_optical_frame
+2) record rosbag file of the door handle: rosbag record -a --duration=30
+3) disconnect pico flexx camera
+4) play rosbag file in a loop: rosbag play -l test.bag
+5) visualize rosbag in rviz: 
+fixed frame: pico_flexx_optical_frame_optical_frame
+topic: /pico_flexx/points
+
+6) cd git/care-o-bot-indigo/
+7) start detection node: rosrun ipa_door_handle_detection ipa_door_handle_detection_TM
+8) See segmented door handle select:
+ fixed_frame: pico_flexx_optical_frame
+ topic: /door_handle
+ select color in Color Transformer to view doorhandle in red and door plane in green
+
+9) Add coordinate system of the detected door handle: 
+Add Axes with reference frame: cluster_KOS
